@@ -3,9 +3,332 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Mankeshub</title>
+  <title>Mankeshub GitHub Dashboard</title>
+  <meta name="color-scheme" content="dark">
+  <style>
+    :root {
+      --bg: #090b12;
+      --bg2: #0f1424;
+      --panel: rgba(15, 21, 36, 0.88);
+      --panel-2: rgba(10, 14, 26, 0.92);
+      --border: #1e293b;
+      --text: #e5eefb;
+      --muted: #91a0ba;
+      --accent: #60a5fa;
+      --accent-2: #22d3ee;
+      --shadow: 0 20px 50px rgba(0, 0, 0, 0.35);
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; }
+    body {
+      min-height: 100vh;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top left, rgba(34, 211, 238, 0.13), transparent 28%),
+        radial-gradient(circle at top right, rgba(96, 165, 250, 0.12), transparent 24%),
+        linear-gradient(180deg, #0b1020 0%, var(--bg) 48%, #07090f 100%);
+    }
+    a { color: inherit; text-decoration: none; }
+    .shell { width: min(1400px, calc(100vw - 28px)); margin: 0 auto; padding: 24px 0 42px; }
+    .hero, .card {
+      border: 1px solid rgba(148, 163, 184, 0.14);
+      background: var(--panel);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-radius: 24px;
+    }
+    .hero {
+      padding: 24px;
+      display: grid;
+      grid-template-columns: 1.3fr 0.7fr;
+      gap: 18px;
+      margin-bottom: 18px;
+    }
+    .hero-left, .hero-right {
+      background: linear-gradient(180deg, rgba(15,21,36,0.7), rgba(10,14,26,0.92));
+      border: 1px solid rgba(148, 163, 184, 0.1);
+      border-radius: 22px;
+      padding: 20px;
+    }
+    .profile-row { display: flex; align-items: center; gap: 16px; }
+    .avatar {
+      width: 84px; height: 84px; border-radius: 22px;
+      border: 1px solid rgba(148, 163, 184, 0.16);
+      object-fit: cover;
+    }
+    .eyebrow {
+      display: inline-flex; align-items: center; gap: 10px;
+      color: var(--accent-2); font-size: 12px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.16em; margin-bottom: 10px;
+    }
+    .eyebrow::before {
+      content: ""; width: 10px; height: 10px; border-radius: 999px;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      box-shadow: 0 0 18px rgba(34,211,238,0.55);
+    }
+    h1 { margin: 0; font-size: clamp(2rem, 4vw, 3.4rem); letter-spacing: -0.03em; line-height: 0.98; }
+    .handle, .muted { color: var(--muted); }
+    .bio { margin-top: 12px; color: #c8d5ea; font-size: 15px; max-width: 720px; line-height: 1.55; }
+    .actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+    .btn {
+      border: 1px solid rgba(148, 163, 184, 0.16);
+      border-radius: 16px; padding: 11px 16px; font-weight: 700; font-size: 14px;
+      color: var(--text); background: rgba(15, 23, 42, 0.82); cursor: pointer;
+    }
+    .btn-primary { background: linear-gradient(135deg, var(--accent), var(--accent-2)); color: #07111f; border-color: transparent; }
+    .stats { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-top: 14px; }
+    .stat {
+      border-radius: 18px; padding: 16px; background: rgba(2, 6, 23, 0.46);
+      border: 1px solid rgba(148, 163, 184, 0.12);
+    }
+    .stat-label { font-size: 12px; text-transform: uppercase; letter-spacing: 0.12em; color: var(--muted); margin-bottom: 8px; }
+    .stat-value { font-size: 1.9rem; font-weight: 800; letter-spacing: -0.03em; }
+    .toolbar { display: grid; grid-template-columns: 1fr auto; gap: 12px; align-items: center; margin-bottom: 18px; }
+    .search {
+      width: 100%; border-radius: 18px; border: 1px solid rgba(148, 163, 184, 0.14);
+      background: rgba(10, 14, 26, 0.88); color: var(--text); padding: 14px 16px; outline: none; font-size: 14px;
+    }
+    .layout { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+    .card { padding: 20px; min-height: 60vh; }
+    .card h2 { margin: 0; font-size: 1.25rem; }
+    .sub { color: var(--muted); font-size: 14px; margin: 8px 0 18px; }
+    .list { display: grid; gap: 12px; max-height: 70vh; overflow: auto; padding-right: 4px; }
+    .repo {
+      display: block; border-radius: 20px; padding: 16px;
+      background: var(--panel-2); border: 1px solid rgba(148, 163, 184, 0.12);
+    }
+    .repo-name { margin: 0; font-size: 15px; font-weight: 700; color: #eff6ff; word-break: break-word; }
+    .repo-desc { margin: 8px 0 0; color: #9eb0cf; font-size: 14px; line-height: 1.5; }
+    .meta { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 12px; color: var(--muted); font-size: 12px; }
+    .pill { display: inline-flex; align-items: center; gap: 8px; }
+    .dot {
+      width: 9px; height: 9px; border-radius: 999px;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+    }
+    .empty, .loading, .error {
+      border-radius: 18px; padding: 18px;
+      border: 1px dashed rgba(148, 163, 184, 0.18);
+      color: var(--muted); background: rgba(2, 6, 23, 0.32);
+    }
+    .footer { margin-top: 18px; color: var(--muted); font-size: 12px; text-align: center; }
+    @media (max-width: 1050px) { .hero, .layout { grid-template-columns: 1fr; } }
+    @media (max-width: 720px) {
+      .shell { width: min(100vw - 18px, 1400px); padding-top: 10px; }
+      .hero { padding: 14px; }
+      .hero-left, .hero-right, .card { padding: 16px; }
+      .avatar { width: 70px; height: 70px; border-radius: 18px; }
+      .toolbar { grid-template-columns: 1fr; }
+    }
+  </style>
 </head>
 <body>
-  <h1>Mankeshub test page</h1>
+  <main class="shell">
+    <section class="hero">
+      <div class="hero-left">
+        <div class="eyebrow">GitHub Dashboard</div>
+        <div class="profile-row">
+          <img class="avatar" id="avatar" alt="GitHub avatar" src="https://github.com/Mankeluvsit.png">
+          <div>
+            <h1 id="name">Loading…</h1>
+            <div class="handle" id="handle">@Mankeluvsit</div>
+          </div>
+        </div>
+        <p class="bio" id="bio">Loading profile information…</p>
+        <div class="actions">
+          <a class="btn btn-primary" id="profileLink" href="https://github.com/Mankeluvsit" target="_blank" rel="noreferrer">Open GitHub</a>
+          <button class="btn" id="refreshBtn" type="button">Refresh</button>
+        </div>
+      </div>
+      <div class="hero-right">
+        <div class="eyebrow">Snapshot</div>
+        <div class="stats">
+          <div class="stat"><div class="stat-label">Repos</div><div class="stat-value" id="repoCount">—</div></div>
+          <div class="stat"><div class="stat-label">Starred</div><div class="stat-value" id="starCount">—</div></div>
+          <div class="stat"><div class="stat-label">Followers</div><div class="stat-value" id="followerCount">—</div></div>
+          <div class="stat"><div class="stat-label">Following</div><div class="stat-value" id="followingCount">—</div></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="toolbar">
+      <input id="searchInput" class="search" type="search" placeholder="Search repos, descriptions, owners, or languages">
+      <div class="muted" id="statusText">Loading…</div>
+    </section>
+
+    <section class="layout">
+      <article class="card">
+        <h2>Repositories</h2>
+        <p class="sub" id="reposSub">Loading repositories…</p>
+        <div id="reposList" class="list"><div class="loading">Loading repositories…</div></div>
+      </article>
+
+      <article class="card">
+        <h2>Starred Repositories</h2>
+        <p class="sub" id="starsSub">Loading starred repositories…</p>
+        <div id="starsList" class="list"><div class="loading">Loading starred repositories…</div></div>
+      </article>
+    </section>
+
+    <div class="footer">Live public data from the GitHub API for Mankeluvsit.</div>
+  </main>
+
+  <script>
+    const USERNAME = 'Mankeluvsit';
+    const state = { profile: null, repos: [], starred: [], query: '' };
+
+    const el = {
+      avatar: document.getElementById('avatar'),
+      name: document.getElementById('name'),
+      handle: document.getElementById('handle'),
+      bio: document.getElementById('bio'),
+      profileLink: document.getElementById('profileLink'),
+      repoCount: document.getElementById('repoCount'),
+      starCount: document.getElementById('starCount'),
+      followerCount: document.getElementById('followerCount'),
+      followingCount: document.getElementById('followingCount'),
+      reposSub: document.getElementById('reposSub'),
+      starsSub: document.getElementById('starsSub'),
+      reposList: document.getElementById('reposList'),
+      starsList: document.getElementById('starsList'),
+      searchInput: document.getElementById('searchInput'),
+      statusText: document.getElementById('statusText'),
+      refreshBtn: document.getElementById('refreshBtn')
+    };
+
+    function fmt(value) {
+      return new Intl.NumberFormat().format(value || 0);
+    }
+
+    function formatDate(value) {
+      if (!value) return '—';
+      return new Date(value).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
+    }
+
+    async function fetchAllPages(url) {
+      const items = [];
+      let next = url;
+      while (next) {
+        const res = await fetch(next);
+        if (!res.ok) throw new Error('GitHub API request failed: ' + res.status + ' ' + res.statusText);
+        const data = await res.json();
+        items.push(...data);
+        const link = res.headers.get('Link') || '';
+        const match = link.match(/<([^>]+)>; rel="next"/);
+        next = match ? match[1] : null;
+      }
+      return items;
+    }
+
+    function escapeHtml(value) {
+      return String(value)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    function repoCard(repo, isStarred) {
+      const div = document.createElement('a');
+      div.className = 'repo';
+      div.href = repo.html_url;
+      div.target = '_blank';
+      div.rel = 'noreferrer';
+      div.innerHTML = `
+        <div>
+          <div class="repo-name">${escapeHtml(repo.full_name || repo.name || 'Unknown')}</div>
+          <div class="repo-desc">${escapeHtml(repo.description || 'No description')}</div>
+        </div>
+        <div class="meta">
+          ${repo.language ? `<span class="pill"><span class="dot"></span>${escapeHtml(repo.language)}</span>` : ''}
+          <span class="pill">★ ${fmt(repo.stargazers_count)}</span>
+          <span class="pill">⑂ ${fmt(repo.forks_count)}</span>
+          <span class="pill">Updated ${escapeHtml(formatDate(repo.updated_at))}</span>
+          ${isStarred ? `<span class="pill">Starred</span>` : ``}
+        </div>
+      `;
+      return div;
+    }
+
+    function matches(repo, q) {
+      if (!q) return true;
+      const blob = [repo.name, repo.full_name, repo.description, repo.language, repo.owner && repo.owner.login]
+        .filter(Boolean)
+        .join(' ')
+        .toLowerCase();
+      return blob.includes(q);
+    }
+
+    function renderLists() {
+      const q = state.query.trim().toLowerCase();
+      const repos = state.repos.filter((repo) => matches(repo, q));
+      const stars = state.starred.filter((repo) => matches(repo, q));
+
+      el.reposSub.textContent = `${repos.length} shown of ${state.repos.length}`;
+      el.starsSub.textContent = `${stars.length} shown of ${state.starred.length}`;
+      el.statusText.textContent = q ? `Filtered by "${state.query}"` : 'Showing all items';
+
+      el.reposList.innerHTML = '';
+      el.starsList.innerHTML = '';
+
+      if (!repos.length) el.reposList.innerHTML = '<div class="empty">No repositories matched your search.</div>';
+      else repos.forEach((repo) => el.reposList.appendChild(repoCard(repo, false)));
+
+      if (!stars.length) el.starsList.innerHTML = '<div class="empty">No starred repositories matched your search.</div>';
+      else stars.forEach((repo) => el.starsList.appendChild(repoCard(repo, true)));
+    }
+
+    function renderProfile() {
+      const p = state.profile || {};
+      el.avatar.src = p.avatar_url || `https://github.com/${USERNAME}.png`;
+      el.name.textContent = p.name || USERNAME;
+      el.handle.textContent = '@' + (p.login || USERNAME);
+      el.bio.textContent = p.bio || 'Live public profile, repositories, and starred repositories.';
+      el.profileLink.href = p.html_url || `https://github.com/${USERNAME}`;
+      el.repoCount.textContent = fmt(p.public_repos || state.repos.length);
+      el.starCount.textContent = fmt(state.starred.length);
+      el.followerCount.textContent = fmt(p.followers);
+      el.followingCount.textContent = fmt(p.following);
+    }
+
+    function renderError(message) {
+      const html = `<div class="error">${escapeHtml(message)}</div>`;
+      el.reposList.innerHTML = html;
+      el.starsList.innerHTML = html;
+      el.statusText.textContent = 'Load failed';
+    }
+
+    async function load() {
+      el.statusText.textContent = 'Loading…';
+      try {
+        const [profileRes, repos, starred] = await Promise.all([
+          fetch(`https://api.github.com/users/${USERNAME}`).then((r) => {
+            if (!r.ok) throw new Error('Profile request failed: ' + r.status);
+            return r.json();
+          }),
+          fetchAllPages(`https://api.github.com/users/${USERNAME}/repos?per_page=100&sort=updated`),
+          fetchAllPages(`https://api.github.com/users/${USERNAME}/starred?per_page=100`)
+        ]);
+
+        state.profile = profileRes;
+        state.repos = repos;
+        state.starred = starred;
+        renderProfile();
+        renderLists();
+      } catch (err) {
+        renderError(err && err.message ? err.message : 'Unknown error while loading GitHub data.');
+      }
+    }
+
+    el.searchInput.addEventListener('input', (event) => {
+      state.query = event.target.value;
+      renderLists();
+    });
+
+    el.refreshBtn.addEventListener('click', load);
+    load();
+  </script>
 </body>
 </html>
