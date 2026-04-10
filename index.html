@@ -7,21 +7,25 @@
   <meta name="color-scheme" content="dark">
   <style>
     :root {
-      --bg: #060606;
-      --bg-soft: #0d0d0d;
-      --panel: #111111;
-      --panel-2: #151515;
+      --bg: #050505;
+      --bg-2: #090909;
+      --panel: #101010;
+      --panel-2: #141414;
+      --panel-3: #181818;
       --line: #232323;
       --line-soft: #1a1a1a;
-      --text: #f3f3f1;
-      --muted: #9a9a95;
-      --muted-2: #777771;
-      --accent: #d4d0c8;
-      --shadow: 0 18px 40px rgba(0,0,0,0.35);
+      --text: #f3f2ee;
+      --muted: #a09d95;
+      --muted-2: #7f7b74;
+      --accent: #d9d1c3;
+      --accent-2: #b5ab9b;
+      --good: #c7d3bf;
+      --shadow: 0 20px 50px rgba(0,0,0,0.34);
       --radius-xl: 28px;
       --radius-lg: 22px;
       --radius-md: 16px;
-      --max: 1450px;
+      --radius-sm: 12px;
+      --max: 1480px;
     }
 
     * { box-sizing: border-box; }
@@ -29,38 +33,38 @@
     body {
       min-height: 100vh;
       font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      background:
-        radial-gradient(circle at top, rgba(255,255,255,0.035), transparent 30%),
-        linear-gradient(180deg, #080808 0%, #050505 100%);
       color: var(--text);
+      background:
+        radial-gradient(circle at top, rgba(255,255,255,0.03), transparent 28%),
+        linear-gradient(180deg, var(--bg-2) 0%, var(--bg) 100%);
     }
 
     a { color: inherit; text-decoration: none; }
-    button, input { font: inherit; }
+    button, input, select { font: inherit; }
 
     .shell {
-      width: min(var(--max), calc(100vw - 32px));
+      width: min(var(--max), calc(100vw - 28px));
       margin: 0 auto;
-      padding: 18px 0 32px;
+      padding: 18px 0 30px;
     }
 
     .topbar {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      gap: 18px;
-      padding: 8px 0 18px;
+      gap: 14px;
+      padding: 8px 0 16px;
     }
 
     .brand {
       display: flex;
       align-items: center;
       gap: 12px;
-      color: var(--muted);
-      letter-spacing: 0.18em;
       text-transform: uppercase;
+      letter-spacing: 0.18em;
       font-size: 11px;
       font-weight: 700;
+      color: var(--muted);
     }
 
     .brand-mark {
@@ -68,38 +72,35 @@
       height: 10px;
       border-radius: 999px;
       background: var(--accent);
-      opacity: 0.9;
-      box-shadow: 0 0 18px rgba(255,255,255,0.08);
+      box-shadow: 0 0 14px rgba(255,255,255,0.08);
     }
 
     .hero {
       border: 1px solid var(--line);
-      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
       border-radius: var(--radius-xl);
-      overflow: hidden;
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
       box-shadow: var(--shadow);
+      overflow: hidden;
       margin-bottom: 18px;
     }
 
     .hero-grid {
       display: grid;
-      grid-template-columns: 1.2fr 0.8fr;
+      grid-template-columns: 1.15fr 0.85fr;
+    }
+
+    .hero-main, .hero-side {
+      padding: 32px;
     }
 
     .hero-main {
-      padding: 34px;
       border-right: 1px solid var(--line);
-    }
-
-    .hero-side {
-      padding: 34px;
-      background: linear-gradient(180deg, rgba(255,255,255,0.015), rgba(255,255,255,0));
     }
 
     .eyebrow {
       color: var(--muted);
-      letter-spacing: 0.16em;
       text-transform: uppercase;
+      letter-spacing: 0.16em;
       font-size: 11px;
       font-weight: 700;
       margin-bottom: 18px;
@@ -115,16 +116,16 @@
       width: 88px;
       height: 88px;
       border-radius: 24px;
-      object-fit: cover;
       border: 1px solid var(--line);
-      background: #0b0b0b;
+      background: #0c0c0c;
+      object-fit: cover;
     }
 
     h1 {
       margin: 0;
-      font-size: clamp(2.2rem, 5vw, 4.6rem);
-      line-height: 0.96;
-      letter-spacing: -0.05em;
+      font-size: clamp(2.2rem, 5vw, 4.8rem);
+      line-height: 0.95;
+      letter-spacing: -0.055em;
       font-weight: 700;
     }
 
@@ -137,7 +138,7 @@
     .bio {
       max-width: 760px;
       margin: 22px 0 0;
-      color: #d2d2cd;
+      color: #d5d2cb;
       font-size: 15px;
       line-height: 1.75;
     }
@@ -149,42 +150,42 @@
       margin-top: 24px;
     }
 
-    .btn {
+    .btn, .chip, .control {
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      min-height: 44px;
-      padding: 0 16px;
+      min-height: 42px;
+      padding: 0 14px;
       border-radius: 999px;
       border: 1px solid var(--line);
-      background: #151515;
+      background: var(--panel-2);
       color: var(--text);
       transition: background 0.18s ease, border-color 0.18s ease, transform 0.18s ease;
       cursor: pointer;
     }
 
-    .btn:hover {
+    .btn:hover, .chip:hover, .control:hover {
       background: #1a1a1a;
-      border-color: #2d2d2d;
+      border-color: #313131;
       transform: translateY(-1px);
     }
 
     .btn-primary {
-      background: #f1f1ec;
+      background: var(--accent);
       color: #0a0a0a;
-      border-color: #f1f1ec;
+      border-color: var(--accent);
     }
 
     .btn-primary:hover {
-      background: #ffffff;
-      border-color: #ffffff;
+      background: #efeae1;
+      border-color: #efeae1;
     }
 
     .metric-grid {
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
       gap: 12px;
-      margin-top: 10px;
+      margin-bottom: 16px;
     }
 
     .metric {
@@ -204,44 +205,159 @@
 
     .metric-value {
       font-size: 2rem;
-      letter-spacing: -0.05em;
       font-weight: 650;
+      letter-spacing: -0.05em;
+    }
+
+    .lang-summary {
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      background: rgba(255,255,255,0.01);
+      padding: 16px;
+    }
+
+    .lang-summary-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .lang-title {
+      font-size: 12px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--muted-2);
+    }
+
+    .lang-bars {
+      display: grid;
+      gap: 10px;
+    }
+
+    .lang-row {
+      display: grid;
+      grid-template-columns: 90px 1fr 36px;
+      gap: 12px;
+      align-items: center;
+      font-size: 13px;
+    }
+
+    .lang-name { color: #d8d5ce; }
+
+    .bar {
+      width: 100%;
+      height: 8px;
+      border-radius: 999px;
+      background: #171717;
+      border: 1px solid var(--line-soft);
+      overflow: hidden;
+    }
+
+    .bar > span {
+      display: block;
+      height: 100%;
+      border-radius: 999px;
+      background: linear-gradient(90deg, var(--accent-2), var(--accent));
+      opacity: 0.92;
     }
 
     .toolbar {
       display: grid;
-      grid-template-columns: 1fr auto;
+      grid-template-columns: 1fr auto auto auto;
       gap: 12px;
       margin-bottom: 18px;
     }
 
-    .search {
+    .search, .select {
       width: 100%;
-      min-height: 50px;
+      min-height: 48px;
       border-radius: 18px;
       border: 1px solid var(--line);
-      background: #101010;
+      background: #0f0f0f;
       color: var(--text);
-      padding: 0 18px;
+      padding: 0 16px;
       outline: none;
     }
 
     .search::placeholder { color: var(--muted-2); }
-    .search:focus {
-      border-color: #383838;
+    .search:focus, .select:focus {
+      border-color: #343434;
       box-shadow: 0 0 0 4px rgba(255,255,255,0.03);
     }
 
+    .toggle-group {
+      display: inline-flex;
+      gap: 8px;
+      padding: 4px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: #0f0f0f;
+    }
+
+    .chip {
+      min-height: 38px;
+      padding: 0 12px;
+      background: transparent;
+      border-color: transparent;
+      color: var(--muted);
+    }
+
+    .chip.active {
+      background: var(--panel-3);
+      border-color: var(--line);
+      color: var(--text);
+    }
+
     .status {
-      min-height: 50px;
+      min-height: 48px;
       padding: 0 16px;
       display: inline-flex;
       align-items: center;
       border-radius: 18px;
       border: 1px solid var(--line);
-      background: #101010;
+      background: #0f0f0f;
       color: var(--muted);
       white-space: nowrap;
+    }
+
+    .featured {
+      border: 1px solid var(--line);
+      border-radius: var(--radius-xl);
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      box-shadow: var(--shadow);
+      padding: 22px;
+      margin-bottom: 18px;
+    }
+
+    .section-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      align-items: end;
+      padding-bottom: 14px;
+      margin-bottom: 14px;
+      border-bottom: 1px solid var(--line-soft);
+    }
+
+    .section-head h2, .panel h2 {
+      margin: 0;
+      font-size: 1.25rem;
+      letter-spacing: -0.03em;
+      font-weight: 650;
+    }
+
+    .sub {
+      color: var(--muted);
+      font-size: 13px;
+      margin-top: 6px;
+    }
+
+    .featured-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
     }
 
     .layout {
@@ -256,30 +372,7 @@
       background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
       box-shadow: var(--shadow);
       padding: 22px;
-      min-height: 65vh;
-    }
-
-    .panel-head {
-      display: flex;
-      align-items: end;
-      justify-content: space-between;
-      gap: 16px;
-      margin-bottom: 16px;
-      padding-bottom: 14px;
-      border-bottom: 1px solid var(--line-soft);
-    }
-
-    .panel h2 {
-      margin: 0;
-      font-size: 1.25rem;
-      letter-spacing: -0.03em;
-      font-weight: 650;
-    }
-
-    .sub {
-      color: var(--muted);
-      font-size: 13px;
-      margin-top: 6px;
+      min-height: 64vh;
     }
 
     .list {
@@ -293,8 +386,8 @@
     .repo {
       display: block;
       border: 1px solid var(--line);
-      border-radius: 20px;
-      background: linear-gradient(180deg, #131313 0%, #101010 100%);
+      border-radius: 18px;
+      background: linear-gradient(180deg, #141414 0%, #101010 100%);
       padding: 16px;
       transition: border-color 0.18s ease, transform 0.18s ease, background 0.18s ease;
     }
@@ -302,7 +395,11 @@
     .repo:hover {
       border-color: #343434;
       transform: translateY(-2px);
-      background: linear-gradient(180deg, #161616 0%, #111111 100%);
+      background: linear-gradient(180deg, #171717 0%, #111111 100%);
+    }
+
+    .repo.compact {
+      padding: 13px 14px;
     }
 
     .repo-top {
@@ -320,11 +417,20 @@
       word-break: break-word;
     }
 
+    .repo.compact .repo-name {
+      font-size: 14px;
+    }
+
     .repo-desc {
       margin: 8px 0 0;
-      color: #b6b6b0;
+      color: #b8b5ae;
       font-size: 14px;
       line-height: 1.6;
+    }
+
+    .repo.compact .repo-desc {
+      font-size: 13px;
+      margin-top: 6px;
     }
 
     .tag {
@@ -351,6 +457,11 @@
       font-size: 12px;
     }
 
+    .repo.compact .meta {
+      margin-top: 10px;
+      gap: 8px;
+    }
+
     .pill {
       display: inline-flex;
       align-items: center;
@@ -366,16 +477,53 @@
       width: 8px;
       height: 8px;
       border-radius: 999px;
-      background: #d7d3cb;
+      background: var(--accent);
       opacity: 0.85;
     }
 
+    .cta-row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 10px;
+    }
+
+    .ghost-link {
+      color: var(--muted);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+
     .empty, .loading, .error {
-      border: 1px dashed #2e2e2e;
-      border-radius: 20px;
+      border: 1px dashed #2b2b2b;
+      border-radius: 18px;
       background: #101010;
       padding: 18px;
       color: var(--muted);
+    }
+
+    .skeleton-card {
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: linear-gradient(180deg, #131313 0%, #101010 100%);
+      padding: 16px;
+    }
+
+    .sk-line {
+      height: 11px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, #171717, #202020, #171717);
+      background-size: 220% 100%;
+      animation: shimmer 1.7s linear infinite;
+      margin-bottom: 10px;
+    }
+
+    .sk-line:last-child { margin-bottom: 0; }
+
+    @keyframes shimmer {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
     }
 
     .footer {
@@ -386,25 +534,32 @@
       letter-spacing: 0.04em;
     }
 
-    @media (max-width: 1100px) {
+    @media (max-width: 1180px) {
       .hero-grid, .layout { grid-template-columns: 1fr; }
       .hero-main { border-right: 0; border-bottom: 1px solid var(--line); }
+      .featured-grid { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 900px) {
+      .toolbar { grid-template-columns: 1fr 1fr; }
+      .status { grid-column: 1 / -1; }
     }
 
     @media (max-width: 720px) {
       .shell { width: min(var(--max), calc(100vw - 18px)); }
-      .hero-main, .hero-side, .panel { padding: 18px; }
+      .hero-main, .hero-side, .featured, .panel { padding: 18px; }
       .identity { align-items: flex-start; }
       .avatar { width: 72px; height: 72px; border-radius: 20px; }
       .toolbar { grid-template-columns: 1fr; }
       .metric-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .lang-row { grid-template-columns: 72px 1fr 28px; gap: 8px; }
     }
   </style>
 </head>
 <body>
   <main class="shell">
     <div class="topbar">
-      <div class="brand"><span class="brand-mark"></span> Mankeshub / GitHub</div>
+      <div class="brand"><span class="brand-mark"></span> Mankeshub / GitHub Observatory</div>
     </div>
 
     <section class="hero">
@@ -433,34 +588,60 @@
             <div class="metric"><div class="metric-label">Followers</div><div class="metric-value" id="followerCount">—</div></div>
             <div class="metric"><div class="metric-label">Following</div><div class="metric-value" id="followingCount">—</div></div>
           </div>
+          <div class="lang-summary">
+            <div class="lang-summary-head">
+              <div class="lang-title">Language distribution</div>
+              <div class="ghost-link" id="langMeta">Top 5</div>
+            </div>
+            <div class="lang-bars" id="langBars"><div class="loading">Preparing language summary…</div></div>
+          </div>
         </aside>
       </div>
     </section>
 
     <section class="toolbar">
       <input id="searchInput" class="search" type="search" placeholder="Search repositories, starred repos, descriptions, or languages">
+      <select id="sortSelect" class="select" aria-label="Sort repositories">
+        <option value="updated">Sort: Recently updated</option>
+        <option value="stars">Sort: Most starred</option>
+        <option value="alpha">Sort: Alphabetical</option>
+      </select>
+      <div class="toggle-group" role="tablist" aria-label="View mode">
+        <button class="chip active" id="cardViewBtn" type="button">Cards</button>
+        <button class="chip" id="compactViewBtn" type="button">Compact</button>
+      </div>
       <div class="status" id="statusText">Loading…</div>
+    </section>
+
+    <section class="featured">
+      <div class="section-head">
+        <div>
+          <h2>Featured repositories</h2>
+          <div class="sub">A focused selection of your most relevant public projects.</div>
+        </div>
+      </div>
+      <div class="featured-grid" id="featuredGrid"><div class="loading">Loading featured repositories…</div></div>
     </section>
 
     <section class="layout">
       <article class="panel">
-        <div class="panel-head">
+        <div class="section-head">
           <div>
             <h2>Repositories</h2>
             <div class="sub" id="reposSub">Loading repositories…</div>
           </div>
         </div>
-        <div id="reposList" class="list"><div class="loading">Loading repositories…</div></div>
+        <div id="reposList" class="list"></div>
       </article>
 
       <article class="panel">
-        <div class="panel-head">
+        <div class="section-head">
           <div>
-            <h2>Starred Repositories</h2>
-            <div class="sub" id="starsSub">Loading starred repositories…</div>
+            <h2>Starred repositories</h2>
+            <div class="sub" id="starsSub">A curated look at tools and projects you follow.</div>
           </div>
         </div>
-        <div id="starsList" class="list"><div class="loading">Loading starred repositories…</div></div>
+        <div id="starsList" class="list"></div>
       </article>
     </section>
 
@@ -469,7 +650,23 @@
 
   <script>
     const USERNAME = 'Mankeluvsit';
-    const state = { profile: null, repos: [], starred: [], query: '' };
+    const FEATURED_NAMES = [
+      'Kai',
+      'codexUI',
+      'Kai-CodexUI',
+      'LSPatch-OP',
+      'xposed-tool-app',
+      'ShizukuPlus'
+    ];
+
+    const state = {
+      profile: null,
+      repos: [],
+      starred: [],
+      query: '',
+      sort: 'updated',
+      view: 'card'
+    };
 
     const el = {
       avatar: document.getElementById('avatar'),
@@ -481,13 +678,19 @@
       starCount: document.getElementById('starCount'),
       followerCount: document.getElementById('followerCount'),
       followingCount: document.getElementById('followingCount'),
+      langBars: document.getElementById('langBars'),
+      langMeta: document.getElementById('langMeta'),
+      searchInput: document.getElementById('searchInput'),
+      sortSelect: document.getElementById('sortSelect'),
+      cardViewBtn: document.getElementById('cardViewBtn'),
+      compactViewBtn: document.getElementById('compactViewBtn'),
+      statusText: document.getElementById('statusText'),
+      refreshBtn: document.getElementById('refreshBtn'),
+      featuredGrid: document.getElementById('featuredGrid'),
       reposSub: document.getElementById('reposSub'),
       starsSub: document.getElementById('starsSub'),
       reposList: document.getElementById('reposList'),
-      starsList: document.getElementById('starsList'),
-      searchInput: document.getElementById('searchInput'),
-      statusText: document.getElementById('statusText'),
-      refreshBtn: document.getElementById('refreshBtn')
+      starsList: document.getElementById('starsList')
     };
 
     function fmt(value) {
@@ -497,6 +700,15 @@
     function formatDate(value) {
       if (!value) return '—';
       return new Date(value).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
+    }
+
+    function escapeHtml(value) {
+      return String(value)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
     }
 
     async function fetchAllPages(url) {
@@ -514,37 +726,22 @@
       return items;
     }
 
-    function escapeHtml(value) {
-      return String(value)
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#39;');
+    function repoScore(repo) {
+      const updatedWeight = repo.pushed_at ? new Date(repo.pushed_at).getTime() / 1e11 : 0;
+      const stars = repo.stargazers_count || 0;
+      const forks = repo.forks_count || 0;
+      return stars * 8 + forks * 3 + updatedWeight;
     }
 
-    function repoCard(repo, isStarred) {
-      const div = document.createElement('a');
-      div.className = 'repo';
-      div.href = repo.html_url;
-      div.target = '_blank';
-      div.rel = 'noreferrer';
-      div.innerHTML = `
-        <div class="repo-top">
-          <div>
-            <div class="repo-name">${escapeHtml(repo.full_name || repo.name || 'Unknown')}</div>
-            <div class="repo-desc">${escapeHtml(repo.description || 'No description')}</div>
-          </div>
-          ${isStarred ? '<div class="tag">Starred</div>' : ''}
-        </div>
-        <div class="meta">
-          ${repo.language ? `<span class="pill"><span class="dot"></span>${escapeHtml(repo.language)}</span>` : ''}
-          <span class="pill">★ ${fmt(repo.stargazers_count)}</span>
-          <span class="pill">⑂ ${fmt(repo.forks_count)}</span>
-          <span class="pill">Updated ${escapeHtml(formatDate(repo.updated_at))}</span>
-        </div>
-      `;
-      return div;
+    function sortRepos(list, sortMode) {
+      const copy = [...list];
+      if (sortMode === 'stars') {
+        return copy.sort((a, b) => (b.stargazers_count || 0) - (a.stargazers_count || 0) || repoScore(b) - repoScore(a));
+      }
+      if (sortMode === 'alpha') {
+        return copy.sort((a, b) => (a.full_name || a.name || '').localeCompare(b.full_name || b.name || ''));
+      }
+      return copy.sort((a, b) => new Date(b.pushed_at || b.updated_at || 0) - new Date(a.pushed_at || a.updated_at || 0));
     }
 
     function matches(repo, q) {
@@ -556,23 +753,45 @@
       return blob.includes(q);
     }
 
-    function renderLists() {
-      const q = state.query.trim().toLowerCase();
-      const repos = state.repos.filter((repo) => matches(repo, q));
-      const stars = state.starred.filter((repo) => matches(repo, q));
+    function makeSkeletons(count = 4) {
+      return Array.from({ length: count }).map(() => `
+        <div class="skeleton-card">
+          <div class="sk-line" style="width: 48%;"></div>
+          <div class="sk-line" style="width: 88%;"></div>
+          <div class="sk-line" style="width: 70%;"></div>
+        </div>
+      `).join('');
+    }
 
-      el.reposSub.textContent = `${repos.length} shown of ${state.repos.length}`;
-      el.starsSub.textContent = `${stars.length} shown of ${state.starred.length}`;
-      el.statusText.textContent = q ? `Filtered by “${state.query}”` : 'Showing all items';
+    function repoCard(repo, options = {}) {
+      const { isStarred = false, compact = false, featured = false } = options;
+      const article = document.createElement('a');
+      article.className = 'repo' + (compact ? ' compact' : '');
+      article.href = repo.html_url;
+      article.target = '_blank';
+      article.rel = 'noreferrer';
 
-      el.reposList.innerHTML = '';
-      el.starsList.innerHTML = '';
+      const issueCount = typeof repo.open_issues_count === 'number' ? repo.open_issues_count : null;
+      const visibilityTag = repo.private ? 'Private' : (repo.archived ? 'Archived' : 'Public');
 
-      if (!repos.length) el.reposList.innerHTML = '<div class="empty">No repositories matched your search.</div>';
-      else repos.forEach((repo) => el.reposList.appendChild(repoCard(repo, false)));
-
-      if (!stars.length) el.starsList.innerHTML = '<div class="empty">No starred repositories matched your search.</div>';
-      else stars.forEach((repo) => el.starsList.appendChild(repoCard(repo, true)));
+      article.innerHTML = `
+        <div class="repo-top">
+          <div>
+            <div class="repo-name">${escapeHtml(repo.full_name || repo.name || 'Unknown')}</div>
+            <div class="repo-desc">${escapeHtml(repo.description || 'No description')}</div>
+          </div>
+          ${featured ? '<div class="tag">Featured</div>' : isStarred ? '<div class="tag">Starred</div>' : `<div class="tag">${escapeHtml(visibilityTag)}</div>`}
+        </div>
+        <div class="meta">
+          ${repo.language ? `<span class="pill"><span class="dot"></span>${escapeHtml(repo.language)}</span>` : ''}
+          <span class="pill">★ ${fmt(repo.stargazers_count)}</span>
+          <span class="pill">⑂ ${fmt(repo.forks_count)}</span>
+          ${issueCount !== null ? `<span class="pill">Issues ${fmt(issueCount)}</span>` : ''}
+          <span class="pill">Updated ${escapeHtml(formatDate(repo.updated_at))}</span>
+        </div>
+        ${featured ? `<div class="cta-row"><span class="ghost-link">Open repository ↗</span></div>` : ''}
+      `;
+      return article;
     }
 
     function renderProfile() {
@@ -588,15 +807,104 @@
       el.followingCount.textContent = fmt(p.following);
     }
 
+    function renderLanguages() {
+      const counts = {};
+      state.repos.forEach((repo) => {
+        if (!repo.language) return;
+        counts[repo.language] = (counts[repo.language] || 0) + 1;
+      });
+      const entries = Object.entries(counts).sort((a, b) => b[1] - a[1]).slice(0, 5);
+      if (!entries.length) {
+        el.langBars.innerHTML = '<div class="empty">No language data available.</div>';
+        el.langMeta.textContent = 'No data';
+        return;
+      }
+      const max = entries[0][1];
+      el.langMeta.textContent = `${entries.length} shown`;
+      el.langBars.innerHTML = '';
+      entries.forEach(([name, count]) => {
+        const row = document.createElement('div');
+        row.className = 'lang-row';
+        row.innerHTML = `
+          <div class="lang-name">${escapeHtml(name)}</div>
+          <div class="bar"><span style="width:${Math.max(10, (count / max) * 100)}%"></span></div>
+          <div class="lang-name">${fmt(count)}</div>
+        `;
+        el.langBars.appendChild(row);
+      });
+    }
+
+    function featuredRepos() {
+      const named = FEATURED_NAMES
+        .map((name) => state.repos.find((repo) => (repo.name || '').toLowerCase() === name.toLowerCase()))
+        .filter(Boolean);
+
+      const fallback = sortRepos(
+        state.repos.filter((repo) => !named.includes(repo)),
+        'stars'
+      ).slice(0, Math.max(0, 6 - named.length));
+
+      return [...named, ...fallback].slice(0, 6);
+    }
+
+    function renderFeatured() {
+      const items = featuredRepos();
+      if (!items.length) {
+        el.featuredGrid.innerHTML = '<div class="empty">No featured repositories available.</div>';
+        return;
+      }
+      el.featuredGrid.innerHTML = '';
+      items.forEach((repo) => el.featuredGrid.appendChild(repoCard(repo, { featured: true })));
+    }
+
+    function renderLists() {
+      const q = state.query.trim().toLowerCase();
+      const compact = state.view === 'compact';
+      const repos = sortRepos(state.repos.filter((repo) => matches(repo, q)), state.sort);
+      const stars = sortRepos(state.starred.filter((repo) => matches(repo, q)), state.sort);
+
+      el.reposSub.textContent = `${repos.length} shown of ${state.repos.length} • ${state.sort}`;
+      el.starsSub.textContent = `${stars.length} shown of ${state.starred.length} • curated inspiration and tools`;
+      el.statusText.textContent = q ? `Filtered by “${state.query}”` : `Viewing ${state.view} mode`;
+
+      el.reposList.innerHTML = '';
+      el.starsList.innerHTML = '';
+
+      if (!repos.length) {
+        el.reposList.innerHTML = '<div class="empty">No repositories matched your search. Clear the query or change the sort.</div>';
+      } else {
+        repos.forEach((repo) => el.reposList.appendChild(repoCard(repo, { compact })));
+      }
+
+      if (!stars.length) {
+        el.starsList.innerHTML = '<div class="empty">No starred repositories matched your search. Clear the query to see your full list.</div>';
+      } else {
+        stars.forEach((repo) => el.starsList.appendChild(repoCard(repo, { isStarred: true, compact })));
+      }
+    }
+
     function renderError(message) {
       const html = `<div class="error">${escapeHtml(message)}</div>`;
+      el.featuredGrid.innerHTML = html;
       el.reposList.innerHTML = html;
       el.starsList.innerHTML = html;
+      el.langBars.innerHTML = html;
       el.statusText.textContent = 'Load failed';
+      el.reposSub.textContent = 'Unable to load repositories';
+      el.starsSub.textContent = 'Unable to load starred repositories';
+    }
+
+    function setLoading() {
+      el.statusText.textContent = 'Loading…';
+      const skeletons = makeSkeletons(4);
+      el.featuredGrid.innerHTML = skeletons;
+      el.reposList.innerHTML = skeletons;
+      el.starsList.innerHTML = skeletons;
+      el.langBars.innerHTML = '<div class="loading">Preparing language summary…</div>';
     }
 
     async function load() {
-      el.statusText.textContent = 'Loading…';
+      setLoading();
       try {
         const [profileRes, repos, starred] = await Promise.all([
           fetch(`https://api.github.com/users/${USERNAME}`).then((r) => {
@@ -611,6 +919,8 @@
         state.repos = repos;
         state.starred = starred;
         renderProfile();
+        renderLanguages();
+        renderFeatured();
         renderLists();
       } catch (err) {
         renderError(err && err.message ? err.message : 'Unknown error while loading GitHub data.');
@@ -619,6 +929,25 @@
 
     el.searchInput.addEventListener('input', (event) => {
       state.query = event.target.value;
+      renderLists();
+    });
+
+    el.sortSelect.addEventListener('change', (event) => {
+      state.sort = event.target.value;
+      renderLists();
+    });
+
+    el.cardViewBtn.addEventListener('click', () => {
+      state.view = 'card';
+      el.cardViewBtn.classList.add('active');
+      el.compactViewBtn.classList.remove('active');
+      renderLists();
+    });
+
+    el.compactViewBtn.addEventListener('click', () => {
+      state.view = 'compact';
+      el.compactViewBtn.classList.add('active');
+      el.cardViewBtn.classList.remove('active');
       renderLists();
     });
 
