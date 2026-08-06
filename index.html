@@ -3,7 +3,13 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Mankeshub GitHub Dashboard</title>
+  <title>Mankeshub GitHub Observatory</title>
+  <meta name="description" content="Mankeshub GitHub Observatory — a live dashboard of Mankeluvsit's repositories, starred projects, and language distribution, powered by the GitHub API.">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Mankeshub GitHub Observatory">
+  <meta property="og:description" content="A live dashboard of Mankeluvsit's repositories, starred projects, and language distribution.">
+  <meta property="og:url" content="https://mankeluvsit.github.io/">
+  <meta property="og:image" content="https://github.com/Mankeluvsit.png">
   <meta name="color-scheme" content="dark">
   <style>
     :root {
@@ -32,7 +38,7 @@
     html, body { margin: 0; padding: 0; }
     body {
       min-height: 100vh;
-      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       color: var(--text);
       background:
         radial-gradient(circle at top, rgba(255,255,255,0.03), transparent 28%),
@@ -183,7 +189,7 @@
 
     .metric-grid {
       display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
+      grid-template-columns: repeat(3, minmax(0, 1fr));
       gap: 12px;
       margin-bottom: 16px;
     }
@@ -309,6 +315,8 @@
       border-color: var(--line);
       color: var(--text);
     }
+
+    .chip[hidden] { display: none; }
 
     .status {
       min-height: 48px;
@@ -557,6 +565,9 @@
   </style>
 </head>
 <body>
+  <noscript>
+    <div style="max-width:640px;margin:0 auto;padding:32px 20px;color:#a09d95;font-family:ui-sans-serif,system-ui,sans-serif;line-height:1.6;text-align:center">This dashboard requires JavaScript to load live data from the GitHub API. Please enable JavaScript to view it.</div>
+  </noscript>
   <main class="shell">
     <div class="topbar">
       <div class="brand"><span class="brand-mark"></span> Mankeshub / GitHub Observatory</div>
@@ -587,6 +598,7 @@
             <div class="metric"><div class="metric-label">Starred</div><div class="metric-value" id="starCount">—</div></div>
             <div class="metric"><div class="metric-label">Followers</div><div class="metric-value" id="followerCount">—</div></div>
             <div class="metric"><div class="metric-label">Following</div><div class="metric-value" id="followingCount">—</div></div>
+            <div class="metric"><div class="metric-label">Total stars</div><div class="metric-value" id="starTotalCount">—</div></div>
           </div>
           <div class="lang-summary">
             <div class="lang-summary-head">
@@ -600,17 +612,17 @@
     </section>
 
     <section class="toolbar">
-      <input id="searchInput" class="search" type="search" placeholder="Search repositories, starred repos, descriptions, or languages">
+      <input id="searchInput" class="search" type="search" aria-label="Search repositories, starred repos, descriptions, or languages" placeholder="Search repositories, starred repos, descriptions, or languages">
       <select id="sortSelect" class="select" aria-label="Sort repositories">
         <option value="updated">Sort: Recently updated</option>
         <option value="stars">Sort: Most starred</option>
         <option value="alpha">Sort: Alphabetical</option>
       </select>
       <div class="toggle-group" role="tablist" aria-label="View mode">
-        <button class="chip active" id="cardViewBtn" type="button">Cards</button>
-        <button class="chip" id="compactViewBtn" type="button">Compact</button>
+        <button class="chip active" id="cardViewBtn" type="button" role="tab" aria-selected="true">Cards</button>
+        <button class="chip" id="compactViewBtn" type="button" role="tab" aria-selected="false">Compact</button>
       </div>
-      <div class="status" id="statusText">Loading…</div>
+      <div class="status" id="statusText" role="status" aria-live="polite">Loading…</div>
     </section>
 
     <section class="featured">
@@ -640,6 +652,7 @@
             <h2>Starred repositories</h2>
             <div class="sub" id="starsSub">A curated look at tools and projects you follow.</div>
           </div>
+          <button class="chip" id="starsToggle" type="button" hidden>Show all</button>
         </div>
         <div id="starsList" class="list"></div>
       </article>
@@ -650,6 +663,7 @@
 
   <script>
     const USERNAME = 'Mankeluvsit';
+    const STAR_CAP = 60;
     const FEATURED_NAMES = [
       'Kai',
       'codexUI',
@@ -665,7 +679,8 @@
       starred: [],
       query: '',
       sort: 'updated',
-      view: 'card'
+      view: 'card',
+      starsExpanded: false
     };
 
     const el = {
@@ -678,6 +693,7 @@
       starCount: document.getElementById('starCount'),
       followerCount: document.getElementById('followerCount'),
       followingCount: document.getElementById('followingCount'),
+      starTotalCount: document.getElementById('starTotalCount'),
       langBars: document.getElementById('langBars'),
       langMeta: document.getElementById('langMeta'),
       searchInput: document.getElementById('searchInput'),
@@ -690,7 +706,8 @@
       reposSub: document.getElementById('reposSub'),
       starsSub: document.getElementById('starsSub'),
       reposList: document.getElementById('reposList'),
-      starsList: document.getElementById('starsList')
+      starsList: document.getElementById('starsList'),
+      starsToggle: document.getElementById('starsToggle')
     };
 
     function fmt(value) {
@@ -805,6 +822,7 @@
       el.starCount.textContent = fmt(state.starred.length);
       el.followerCount.textContent = fmt(p.followers);
       el.followingCount.textContent = fmt(p.following);
+      el.starTotalCount.textContent = fmt(state.repos.reduce((sum, repo) => sum + (repo.stargazers_count || 0), 0));
     }
 
     function renderLanguages() {
@@ -861,10 +879,20 @@
       const q = state.query.trim().toLowerCase();
       const compact = state.view === 'compact';
       const repos = sortRepos(state.repos.filter((repo) => matches(repo, q)), state.sort);
-      const stars = sortRepos(state.starred.filter((repo) => matches(repo, q)), state.sort);
+      const starsAll = sortRepos(state.starred.filter((repo) => matches(repo, q)), state.sort);
+      const stars = state.starsExpanded ? starsAll : starsAll.slice(0, STAR_CAP);
 
       el.reposSub.textContent = `${repos.length} shown of ${state.repos.length} • ${state.sort}`;
-      el.starsSub.textContent = `${stars.length} shown of ${state.starred.length} • curated inspiration and tools`;
+      el.starsSub.textContent = stars.length === starsAll.length
+        ? `${stars.length} shown of ${state.starred.length} • curated inspiration and tools`
+        : `Showing top ${stars.length} of ${state.starred.length} starred • curated inspiration and tools`;
+
+      if (starsAll.length > STAR_CAP) {
+        el.starsToggle.hidden = false;
+        el.starsToggle.textContent = state.starsExpanded ? 'Show fewer' : `Show all ${fmt(starsAll.length)}`;
+      } else {
+        el.starsToggle.hidden = true;
+      }
       el.statusText.textContent = q ? `Filtered by “${state.query}”` : `Viewing ${state.view} mode`;
 
       el.reposList.innerHTML = '';
@@ -896,6 +924,7 @@
 
     function setLoading() {
       el.statusText.textContent = 'Loading…';
+      el.starsToggle.hidden = true;
       const skeletons = makeSkeletons(4);
       el.featuredGrid.innerHTML = skeletons;
       el.reposList.innerHTML = skeletons;
@@ -941,6 +970,8 @@
       state.view = 'card';
       el.cardViewBtn.classList.add('active');
       el.compactViewBtn.classList.remove('active');
+      el.cardViewBtn.setAttribute('aria-selected', 'true');
+      el.compactViewBtn.setAttribute('aria-selected', 'false');
       renderLists();
     });
 
@@ -948,6 +979,13 @@
       state.view = 'compact';
       el.compactViewBtn.classList.add('active');
       el.cardViewBtn.classList.remove('active');
+      el.compactViewBtn.setAttribute('aria-selected', 'true');
+      el.cardViewBtn.setAttribute('aria-selected', 'false');
+      renderLists();
+    });
+
+    el.starsToggle.addEventListener('click', () => {
+      state.starsExpanded = !state.starsExpanded;
       renderLists();
     });
 
