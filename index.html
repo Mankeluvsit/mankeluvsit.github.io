@@ -664,6 +664,10 @@
   <script>
     const USERNAME = 'Mankeluvsit';
     const STAR_CAP = 60;
+    const CACHE_KEY = 'mankeshub-dashboard-v1';
+    const CACHE_TTL = 10 * 60 * 1000; // fresh data served without touching the API
+    const RETRY_DELAY = 60 * 1000;    // sync issues retried after 1 minute
+    const MAX_RETRIES = 3;            // then it stops and asks for a manual refresh
     const FEATURED_NAMES = [
       'Kai',
       'codexUI',
@@ -680,7 +684,11 @@
       query: '',
       sort: 'updated',
       view: 'card',
-      starsExpanded: false
+      starsExpanded: false,
+      loading: false,
+      retries: 0,
+      retryTimer: null,
+      lastAttemptAt: 0
     };
 
     const el = {
@@ -726,6 +734,26 @@
         .replace(/>/g, '&gt;')
         .replace(/"/g, '&quot;')
         .replace(/'/g, '&#39;');
+    }
+
+    function loadCache() {
+      try {
+        const raw = localStorage.getItem(CACHE_KEY);
+        if (!raw) return null;
+        const data = JSON.parse(raw);
+        if (!data || !data.savedAt || !Array.isArray(data.repos) || !Array.isArray(data.starred)) return null;
+        return data;
+      } catch (e) {
+        return null;
+      }
+    }
+
+    function saveCache(profile, repos, starred) {
+      try {
+        localStorage.setItem(CACHE_KEY, JSON.stringify({ savedAt: Date.now(), profile, repos, starred }));
+      } catch (e) {
+        // storage unavailable (private mode / quota) — caching is best-effort
+      }
     }
 
     async function fetchAllPages(url) {
@@ -893,7 +921,9 @@
       } else {
         el.starsToggle.hidden = true;
       }
-      el.statusText.textContent = q ? `Filtered by “${state.query}”` : `Viewing ${state.view} mode`;
+      if (!state.retries && !state.retryTimer) {
+        el.statusText.textContent = q ? `Filtered by “${state.query}”` : `Viewing ${state.view} mode`;
+      }
 
       el.reposList.innerHTML = '';
       el.starsList.innerHTML = '';
@@ -923,7 +953,9 @@
     }
 
     function setLoading() {
-      el.statusText.textContent = 'Loading…';
+      const hasData = !!(state.profile && state.repos.length);
+      el.statusText.textContent = hasData ? 'Syncing fresh data…' : 'Loading…';
+      if (hasData) return; // keep the cached view visible while re-syncing
       el.starsToggle.hidden = true;
       const skeletons = makeSkeletons(4);
       el.featuredGrid.innerHTML = skeletons;
@@ -932,10 +964,51 @@
       el.langBars.innerHTML = '<div class="loading">Preparing language summary…</div>';
     }
 
-    async function load() {
+    function renderAll() {
+      renderProfile();
+      renderLanguages();
+      renderFeatured();
+      renderLists();
+    }
+
+    function scheduleRetry(message, hadData) {
+      // long gap since the last attempt (e.g. user returned later) — restart the retry cycle
+      if (Date.now() - state.lastAttemptAt > 5 * 60 * 1000) state.retries = 0;
+      state.retries += 1;
+      if (state.retries >= MAX_RETRIES) {
+        el.statusText.textContent = `Sync failed after ${state.retries} attempts — press Refresh to retry.`;
+        return;
+      }
+      el.statusText.textContent = hadData
+        ? `Sync issue (${message}) — showing cached data. Retrying in 1 min…`
+        : `Sync failed (${message}) — retrying in 1 min…`;
+      clearTimeout(state.retryTimer);
+      state.retryTimer = setTimeout(() => load({ force: true }), RETRY_DELAY);
+    }
+
+    async function load({ force = false } = {}) {
+      if (state.loading) return; // never queue concurrent syncs
+      clearTimeout(state.retryTimer);
+      state.retryTimer = null;
+
+      const cache = loadCache();
+      if (cache && cache.profile) {
+        state.profile = cache.profile;
+        state.repos = cache.repos;
+        state.starred = cache.starred;
+        renderAll();
+        if (!force && Date.now() - cache.savedAt < CACHE_TTL) {
+          const nextIn = Math.max(1, Math.ceil((CACHE_TTL - (Date.now() - cache.savedAt)) / 60000));
+          el.statusText.textContent = `Cached ${new Date(cache.savedAt).toLocaleTimeString()} • next sync in ${nextIn} min`;
+          return;
+        }
+      }
+
+      state.loading = true;
+      state.lastAttemptAt = Date.now();
       setLoading();
       try {
-        const [profileRes, repos, starred] = await Promise.all([
+        const results = await Promise.allSettled([
           fetch(`https://api.github.com/users/${USERNAME}`).then((r) => {
             if (!r.ok) throw new Error('Profile request failed: ' + r.status);
             return r.json();
@@ -944,15 +1017,40 @@
           fetchAllPages(`https://api.github.com/users/${USERNAME}/starred?per_page=100`)
         ]);
 
-        state.profile = profileRes;
-        state.repos = repos;
-        state.starred = starred;
-        renderProfile();
-        renderLanguages();
-        renderFeatured();
-        renderLists();
+        const failures = [];
+        if (results[0].status === 'fulfilled') state.profile = results[0].value;
+        else failures.push('profile');
+        if (results[1].status === 'fulfilled') state.repos = results[1].value;
+        else failures.push('repos');
+        if (results[2].status === 'fulfilled') state.starred = results[2].value;
+        else failures.push('starred');
+
+        if (state.profile && state.repos && failures.length === 0) saveCache(state.profile, state.repos, state.starred);
+
+        if (failures.length) {
+          const hadData = !!(state.profile && state.repos.length);
+          if (hadData) {
+            renderAll(); // keep showing cached + whatever succeeded
+          } else {
+            renderError(`GitHub API failed for: ${failures.join(', ')}`);
+          }
+          scheduleRetry(`GitHub API failed for: ${failures.join(', ')}`, hadData);
+        } else {
+          renderAll();
+          state.retries = 0;
+          el.statusText.textContent = `Synced ${new Date().toLocaleTimeString()} • next sync in ${Math.ceil(CACHE_TTL / 60000)} min`;
+        }
       } catch (err) {
-        renderError(err && err.message ? err.message : 'Unknown error while loading GitHub data.');
+        const message = err && err.message ? err.message : 'Unknown error while loading GitHub data.';
+        if (state.profile && state.repos.length) {
+          renderAll(); // keep cached view rendered
+          scheduleRetry(message, true);
+        } else {
+          renderError(message);
+          scheduleRetry(message, false);
+        }
+      } finally {
+        state.loading = false;
       }
     }
 
@@ -989,7 +1087,7 @@
       renderLists();
     });
 
-    el.refreshBtn.addEventListener('click', load);
+    el.refreshBtn.addEventListener('click', () => load());
     load();
   </script>
 </body>
